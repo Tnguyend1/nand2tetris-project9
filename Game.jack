@@ -1,0 +1,118 @@
+class Game {
+    field Dot player, target;
+    field int score, key, tick, tx, ty;
+    field boolean done;
+
+    constructor Game new() {
+        let player = Dot.new(250, 120, 8);
+        let target = Dot.new(80, 60, 6);
+        let score = 0;
+        let key = 0;
+        let tick = 0;
+        let tx = 80;
+        let ty = 60;
+        let done = false;
+        return this;
+    }
+
+    method void drawHud() {
+        do Output.moveCursor(0, 0);
+        do Output.printString("Catch The Dot | Arrows move | Q quits | Score: ");
+        do Output.printInt(score);
+        return;
+    }
+
+    method void maybeMoveTarget() {
+        let tick = tick + 1;
+        if (tick > 30) {
+            let tick = 0;
+            let tx = tx + 31;
+            let ty = ty + 17;
+
+            if (tx > 500) {
+                let tx = tx - 500;
+            }
+            if (ty > 240) {
+                let ty = ty - 240;
+            }
+
+            do target.setPosition(tx, ty);
+        }
+        return;
+    }
+
+    method boolean touching() {
+        var int px, py, cx, cy;
+        let px = player.getX();
+        let py = player.getY();
+        let cx = px + 4;
+        let cy = py + 4;
+        return target.containsPoint(cx, cy);
+    }
+
+    method void processInput() {
+        let key = Keyboard.keyPressed();
+        if ((key = 81) | (key = 113)) {
+            let done = true;
+        }
+        if ((key = 131) | (key = 87) | (key = 119)) {
+            do player.move(0, -3);
+        }
+        if ((key = 130) | (key = 65) | (key = 97)) {
+            do player.move(-3, 0);
+        }
+        if ((key = 132) | (key = 68) | (key = 100)) {
+            do player.move(3, 0);
+        }
+        if ((key = 133) | (key = 83) | (key = 115)) {
+            do player.move(0, 3);
+        }
+        return;
+    }
+
+    method void onCatch() {
+        let score = score + 1;
+        do drawHud();
+        let tx = tx + 97;
+        let ty = ty + 43;
+        if (tx > 500) {
+            let tx = tx - 500;
+        }
+        if (ty > 240) {
+            let ty = ty - 240;
+        }
+        do target.setPosition(tx, ty);
+        do Sys.wait(120);
+        return;
+    }
+
+    method void run() {
+        do Screen.clearScreen();
+        do drawHud();
+        do player.draw();
+        do target.draw();
+
+        while (~done) {
+            do processInput();
+            do maybeMoveTarget();
+
+            if (touching()) {
+                do onCatch();
+            }
+
+            do Sys.wait(20);
+        }
+
+        do Output.moveCursor(2, 0);
+        do Output.printString("Game over. Final score: ");
+        do Output.printInt(score);
+        return;
+    }
+
+    method void dispose() {
+        do player.dispose();
+        do target.dispose();
+        do Memory.deAlloc(this);
+        return;
+    }
+}

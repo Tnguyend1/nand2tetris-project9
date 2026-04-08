@@ -1,0 +1,85 @@
+class Dot {
+    field int x, y, size;
+
+    constructor Dot new(int ax, int ay, int asize) {
+        let x = ax;
+        let y = ay;
+        let size = asize;
+        return this;
+    }
+
+    method void draw() {
+        do Screen.setColor(true);
+        do Screen.drawRectangle(x, y, (x + size), (y + size));
+        return;
+    }
+
+    method void erase() {
+        do Screen.setColor(false);
+        do Screen.drawRectangle(x, y, (x + size), (y + size));
+        return;
+    }
+
+    method void move(int dx, int dy) {
+        do erase();
+        let x = x + dx;
+        let y = y + dy;
+
+        if (x < 0) {
+            let x = 0;
+        }
+        if (y < 0) {
+            let y = 0;
+        }
+        if ((x + size) > 511) {
+            let x = 511 - size;
+        }
+        if ((y + size) > 255) {
+            let y = 255 - size;
+        }
+
+        do draw();
+        return;
+    }
+
+    method int getX() {
+        return x;
+    }
+
+    method int getY() {
+        return y;
+    }
+
+    method int getSize() {
+        return size;
+    }
+
+    method void setPosition(int nx, int ny) {
+        do erase();
+        let x = nx;
+        let y = ny;
+        do draw();
+        return;
+    }
+
+    method boolean containsPoint(int px, int py) {
+        if (px < x) {
+            return false;
+        }
+        if (py < y) {
+            return false;
+        }
+        if (px > (x + size)) {
+            return false;
+        }
+        if (py > (y + size)) {
+            return false;
+        }
+        return true;
+    }
+
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+}
